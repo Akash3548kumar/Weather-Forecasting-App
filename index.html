@@ -3,8 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Weather Forecast App</title>
-  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+  <meta name="description" content="Professional weather forecasting app with current conditions and 5-day forecast. Get accurate weather data for any city or your current location." />
+  <meta name="keywords" content="weather, forecast, temperature, weather app, openweathermap" />
+  <title>Weather Forecast - Premium Weather App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌤️</text></svg>" type="image/svg+xml"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
   <link href="styles.css" rel="stylesheet"/>
 </head>
@@ -14,6 +19,7 @@
   </header>
   <main>
     <section class="search-section">
+      <h2><i class="fas fa-search"></i> Search Weather</h2>
       <form id="apiForm">
         <input type="text" id="apiInput" placeholder="Enter your OpenWeatherMap API key..." aria-label="API key"/>
         <button type="submit"><i class="fas fa-key"></i> Set API Key</button>
@@ -23,7 +29,7 @@
         <button type="submit"><i class="fas fa-search"></i> Search</button>
         <button type="button" id="geoBtn" title="Use my location"><i class="fas fa-location-arrow"></i></button>
       </form>
-      <div id="errorMessage" class="error"></div>
+      <div id="errorMessage" class="error hidden"></div>
     </section>
     <section id="weatherSection" class="weather-section hidden">
       <div id="currentWeather" class="card">
@@ -38,7 +44,7 @@
     </div>
   </main>
   <footer>
-    <p>&copy; 2025 Akash Kumar &middot; <a href="https://github.com/Akash3548kumar" target="_blank">GitHub</a></p>
+    <p>&copy; 2025 Akash Kumar &middot; <a href="https://github.com/Akash3548kumar" target="_blank">GitHub</a> &middot; <a href="https://openweathermap.org/" target="_blank">Powered by OpenWeatherMap</a></p>
   </footer>
   <script src="app.js"></script>
 </body>

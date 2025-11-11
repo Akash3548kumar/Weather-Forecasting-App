@@ -14,16 +14,19 @@ const errorMessage = document.getElementById('errorMessage');
 const geoBtn = document.getElementById('geoBtn');
 
 let API_KEY = localStorage.getItem('owm_api_key') || '';
+let lastCity = localStorage.getItem('last_city') || '';
 
 function showLoading(state) {
   loading.classList.toggle('hidden', !state);
 }
 function showError(msg) {
   errorMessage.textContent = msg;
+  errorMessage.classList.remove('hidden');
   weatherSection.classList.add('hidden');
 }
 function clearError() {
   errorMessage.textContent = '';
+  errorMessage.classList.add('hidden');
 }
 function showWeatherSection(state) {
   weatherSection.classList.toggle('hidden', !state);
@@ -41,7 +44,7 @@ apiForm.addEventListener('submit', e => {
   API_KEY = key;
   clearError();
   apiInput.value = '';
-  showError("API Key saved! You can now search for weather.");
+  showError("✅ API Key saved! You can now search for weather.");
 });
 
 cityForm.addEventListener('submit', e => {
@@ -56,6 +59,7 @@ cityForm.addEventListener('submit', e => {
     return;
   }
   clearError();
+  localStorage.setItem('last_city', city);
   fetchWeatherByCity(city);
 });
 
@@ -74,7 +78,7 @@ geoBtn.addEventListener('click', () => {
     pos => fetchWeatherByCoords(pos.coords.latitude, pos.coords.longitude),
     err => {
       showLoading(false);
-      showError("Could not get your location.");
+      showError("Could not get your location. Please check permissions.");
     });
 });
 
@@ -87,7 +91,7 @@ async function fetchWeatherByCity(city) {
     ]);
     renderWeather(weather, forecast);
   } catch (err) {
-    showError("City not found or network error.");
+    showError("City not found or network error. Please try again.");
   }
   showLoading(false);
 }
@@ -108,7 +112,11 @@ async function fetchWeatherByCoords(lat, lon) {
 
 async function fetchData(url) {
   const resp = await fetch(url);
-  if (!resp.ok) throw new Error('Network error');
+  if (!resp.ok) {
+    if (resp.status === 401) throw new Error('Invalid API Key');
+    if (resp.status === 404) throw new Error('City not found');
+    throw new Error('Network error');
+  }
   return resp.json();
 }
 
@@ -120,16 +128,22 @@ function renderWeather(weather, forecast) {
   showWeatherSection(true);
 
   // Current weather card
+  const feelsLike = weather.main.feels_like ? `Feels like ${Math.round(weather.main.feels_like)}°C` : '';
+  const pressure = weather.main.pressure ? `Pressure: ${weather.main.pressure} hPa` : '';
+  const visibility = weather.visibility ? `Visibility: ${(weather.visibility / 1000).toFixed(1)} km` : '';
+
   currentWeatherDiv.innerHTML = `
-    <h2>${weather.name}, ${weather.sys.country}</h2>
+    <h2><i class="fas fa-map-marker-alt"></i> ${weather.name}, ${weather.sys.country}</h2>
     <div class="weather-details">
-      <div><i class="fas fa-temperature-high"></i> ${Math.round(weather.main.temp)}°C</div>
-      <div><i class="fas fa-cloud"></i> ${weather.weather[0].description}</div>
-      <div><i class="fas fa-water"></i> Humidity: ${weather.main.humidity}%</div>
+      <div><i class="fas fa-temperature-high"></i> ${Math.round(weather.main.temp)}°C <span style="font-size: 0.8em; color: var(--text-muted);">(${feelsLike})</span></div>
+      <div><i class="fas fa-cloud"></i> ${weather.weather[0].description.charAt(0).toUpperCase() + weather.weather[0].description.slice(1)}</div>
+      <div><i class="fas fa-tint"></i> Humidity: ${weather.main.humidity}%</div>
       <div><i class="fas fa-wind"></i> Wind: ${weather.wind.speed} m/s</div>
+      ${pressure ? `<div><i class="fas fa-gauge"></i> ${pressure}</div>` : ''}
+      ${visibility ? `<div><i class="fas fa-eye"></i> ${visibility}</div>` : ''}
     </div>
     <img src="${ICON_URL + weather.weather[0].icon}@4x.png" alt="${weather.weather[0].description}" />
-    <div style="margin-top:0.8em; font-size:0.97em; color:#555;">
+    <div style="margin-top:0.8em; font-size:0.9em; color:#94a3b8; text-align: center;">
         Last updated: ${new Date(weather.dt*1000).toLocaleString()}
     </div>
   `;
@@ -147,20 +161,26 @@ function renderWeather(weather, forecast) {
   forecastDiv.innerHTML = '';
   Object.keys(forecasts).slice(today in forecasts ? 1 : 0,6).forEach(date => {
     const fc = forecasts[date];
+    const dayName = new Date(fc.dt_txt).toLocaleDateString(undefined, {weekday: 'short'});
     forecastDiv.innerHTML += `
       <div class="forecast-card">
-        <div>${(new Date(fc.dt_txt)).toLocaleDateString(undefined, {weekday:'short',month:'short',day:'numeric'})}</div>
+        <div>${dayName}</div>
         <img src="${ICON_URL + fc.weather[0].icon}@2x.png" alt="${fc.weather[0].description}" />
-        <div style="font-size:1.2em; font-weight:500;">${Math.round(fc.main.temp)}°C</div>
-        <div style="font-size:.93em;">${fc.weather[0].description}</div>
+        <div>${Math.round(fc.main.temp)}°C</div>
+        <div>${fc.weather[0].description}</div>
       </div>
     `;
   });
 }
 
-// On load: check for API key
+// On load: check for API key and last city
 window.addEventListener('DOMContentLoaded', ()=>{
   if (API_KEY) {
-    showError("API Key loaded from previous session. You can now search.");
+    showError("✅ API Key loaded. Ready to search!");
+    if (lastCity) {
+      cityInput.value = lastCity;
+    }
+  } else {
+    showError("Welcome! Please enter your OpenWeatherMap API Key to get started.");
   }
 });
