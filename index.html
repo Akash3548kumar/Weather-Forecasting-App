@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather Forecast App</title>
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <link href="styles.css" rel="stylesheet"/>
+</head>
+<body>
+  <header>
+    <h1><i class="fas fa-cloud-sun"></i> Weather Forecast App</h1>
+  </header>
+  <main>
+    <section class="search-section">
+      <form id="apiForm">
+        <input type="text" id="apiInput" placeholder="Enter your OpenWeatherMap API key..." aria-label="API key"/>
+        <button type="submit"><i class="fas fa-key"></i> Set API Key</button>
+      </form>
+      <form id="cityForm">
+        <input type="text" id="cityInput" placeholder="Enter a city name..." aria-label="City name"/>
+        <button type="submit"><i class="fas fa-search"></i> Search</button>
+        <button type="button" id="geoBtn" title="Use my location"><i class="fas fa-location-arrow"></i></button>
+      </form>
+      <div id="errorMessage" class="error"></div>
+    </section>
+    <section id="weatherSection" class="weather-section hidden">
+      <div id="currentWeather" class="card">
+        <!-- Filled by script -->
+      </div>
+      <div id="forecast" class="forecast-grid">
+        <!-- 5-day forecast cards -->
+      </div>
+    </section>
+    <div id="loading" class="loading hidden">
+      <i class="fas fa-spinner fa-pulse fa-2x"></i> Loading...
+    </div>
+  </main>
+  <footer>
+    <p>&copy; 2025 Akash Kumar &middot; <a href="https://github.com/Akash3548kumar" target="_blank">GitHub</a></p>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>
